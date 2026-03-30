@@ -333,27 +333,19 @@ def fetch_arxiv_rss(config: dict) -> list[dict]:
     """
     Fetch recent AI/ML papers from ArXiv.
  
-    Strategy — RSS primary, Atom API fallback:
- 
-      ArXiv RSS (rss.arxiv.org) contains only papers from the current day's
-      announcement batch, published once daily around 20:00 ET on weekdays.
-      Outside that window the feed is valid XML but contains zero <item>
-      elements — not an error, just an empty batch.
- 
-      When RSS returns 0 entries, we fall back to the ArXiv Atom API
-      (export.arxiv.org/api/query) which returns papers on demand regardless
-      of time of day and is not tied to the announcement cycle.
- 
-      feedparser.parse(url) sends 'python-feedparser' as its UA which gets
-      blocked in some environments. Both fetches use httpx with a browser UA
-      and pass raw bytes to feedparser.parse(), which accepts bytes identically
-      to a URL.
- 
-    Theme filter:
-      Disabled. Academic paper titles rarely contain plain-English phrases
-      like 'frontier models' or 'enterprise AI' verbatim. The LLM triage gate
-      (Node 3) handles relevance filtering downstream using the full headline
-      and abstract snippet.
+    ArXiv RSS (rss.arxiv.org) contains only papers from the current day's
+    announcement batch, published once daily around 20:00 ET on weekdays.
+    Outside that window the feed is valid XML but contains zero <item>
+    elements — not an error, just an empty batch.
+
+    When RSS returns 0 entries, we fall back to the ArXiv Atom API
+    (export.arxiv.org/api/query) which returns papers on demand regardless
+    of time of day and is not tied to the announcement cycle.
+
+    feedparser.parse(url) sends 'python-feedparser' as its UA which gets
+    blocked in some environments. Both fetches use httpx with a browser UA
+    and pass raw bytes to feedparser.parse(), which accepts bytes identically
+    to a URL.
     """
     days      = config.get("article_date_window_days", 7)
     ai_themes = config.get("ai_themes", [])
@@ -368,7 +360,7 @@ def fetch_arxiv_rss(config: dict) -> list[dict]:
         )
     }
  
-    # ── Phase 1: RSS (fast, current-day batch) ────────────────────────────────
+    # RSS 
     for category, feed_url in [
         ("cs.AI", "https://rss.arxiv.org/rss/cs.AI"),
         ("cs.LG", "https://rss.arxiv.org/rss/cs.LG"),
@@ -407,9 +399,7 @@ def fetch_arxiv_rss(config: dict) -> list[dict]:
         except Exception as e:
             logger.warning(f"arxiv_rss [{category}]: {e}")
  
-    # ── Phase 2: Atom API fallback (on-demand, any time of day) ──────────────
-    # Only runs if RSS returned nothing — i.e. outside the daily announcement
-    # window, on weekends, or on public holidays.
+    # Atom API fallback
     if not articles:
         logger.info(
             "arxiv_rss: RSS batch empty — falling back to Atom API"
@@ -426,11 +416,6 @@ def _fetch_arxiv_atom(
     seen_urls: set,
     headers: dict,
 ) -> list[dict]:
-    """
-    Fallback: query the ArXiv Atom API for recent cs.AI / cs.LG papers.
-    One request per ai_theme, deduplicated across themes.
-    Results are not filtered by theme text — the LLM triage gate handles that.
-    """
     articles = []
  
     # Use themes as search terms; fall back to a broad category query if empty
