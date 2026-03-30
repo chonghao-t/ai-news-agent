@@ -1,0 +1,63 @@
+# --- Watchlist and themes ---
+# These are overridden by .env if set but kept as fallbacks in case .env is incomplete.
+tickers: [NVDA]
+macro_themes: [Fed policy, inflation, employment, credit markets]
+ai_themes: [frontier models, AI regulation, AI safety, enterprise AI]
+
+# --- Fetch settings ---
+article_date_window_days: 7
+max_candidates_per_category: 100
+
+# --- Triage quotas (LLM is instructed; code enforces) ---
+max_triage_stocks: 20
+max_triage_macro: 6
+max_triage_ai: 8
+
+# --- Digest size ---
+max_items_stocks: 20
+max_items_macro: 3
+max_items_ai: 4
+
+# --- STOCKS selection ---
+# Articles scoring at or above this threshold are included in the digest.
+# Lower = more articles; raise if digest is too noisy.
+stocks_score_threshold: 0.5
+# Maximum articles per ticker in a single digest run.
+# Prevents one heavily-covered ticker from dominating the section.
+max_items_per_ticker: 3
+
+# --- Scoring weights (must sum to 1.0) ---
+weight_relevance: 0.40
+weight_recency:   0.20
+weight_tier:      0.15
+weight_novelty:   0.25
+
+# --- Deduplication thresholds ---
+similarity_hard_exclude:  0.88
+similarity_soft_suppress: 0.75
+
+# --- LLM ---
+openai_model: gpt-4o-mini
+openai_max_tokens: 1024
+llm_temperature_triage:    0.1
+llm_temperature_summarize: 0.3
+
+# --- Embeddings ---
+embedding_model: nomic-ai/nomic-embed-text-v1
+
+# --- RAG ---
+rag_retention_days:         7
+rag_context_min_similarity: 0.30
+rag_context_max_similarity: 0.75
+
+# --- Summarization ---
+include_why_it_matters: true
+summary_max_bullets: 4
+
+# --- Scheduling ---
+schedule_cron: "0 7 * * *"
+timezone: Asia/Singapore
+
+# --- Operations ---
+min_articles_to_send: 3
+log_level: INFO

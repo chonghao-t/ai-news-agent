@@ -1,0 +1,31 @@
+# sources.yaml
+sources:
+  - name: yahoo_finance_rss
+    category: stocks
+    tier: 1
+    enabled: true
+
+  - name: alpha_vantage
+    category: stocks
+    tier: 1
+    enabled: true
+
+  - name: reuters_rss
+    category: macro
+    tier: 1
+    enabled: true
+
+  - name: fed_rss
+    category: macro
+    tier: 1
+    enabled: true
+
+  - name: huggingface_blog_rss
+    category: ai
+    tier: 1
+    enabled: true
+
+  - name: arxiv_rss
+    category: ai
+    tier: 1
+    enabled: true
